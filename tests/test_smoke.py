@@ -1,9 +1,7 @@
-from fastapi.testclient import TestClient
-
-from app.main import app
-
-
-# Card 1.2b replaces this with the `client` fixture from conftest.py.
-def test_health():
-    client = TestClient(app)
+def test_health(client):
     assert client.get("/health").json() == {"status": "ok"}
+
+
+def test_factories(make_user, make_car):
+    car = make_car(make_user("company"))
+    assert car.is_active
