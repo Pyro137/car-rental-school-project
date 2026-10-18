@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<h1 class="h3 mb-3">{{ title }}</h1>
+<ul>
+  {% for message in messages %}<li>{{ message }}</li>{% endfor %}
+</ul>
+<a class="btn btn-outline-secondary" href="javascript:history.back()">Go back</a>
+{% endblock %}
