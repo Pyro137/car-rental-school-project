@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Sign up{% endblock %}
+{% block content %}
+<h1 class="h3 mb-3">Sign up</h1>
+{% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+<form method="post" class="col-md-4">
+  <div class="mb-3">
+    <label class="form-label" for="full_name">Full name</label>
+    <input class="form-control" id="full_name" name="full_name" required>
+  </div>
+  <div class="mb-3">
+    <label class="form-label" for="email">Email</label>
+    <input class="form-control" type="email" id="email" name="email" required>
+  </div>
+  <div class="mb-3">
+    <label class="form-label" for="password">Password</label>
+    <input class="form-control" type="password" id="password" name="password" minlength="8"
+           required>
+    <div class="form-text">At least 8 characters.</div>
+  </div>
+  <div class="mb-3">
+    <label class="form-label" for="role">Account type</label>
+    <select class="form-select" id="role" name="role">
+      <option value="customer">Customer</option>
+      <option value="company">Rental company</option>
+    </select>
+  </div>
+  <div class="mb-3">
+    <label class="form-label" for="company_name">Company name</label>
+    <input class="form-control" id="company_name" name="company_name">
+    <div class="form-text">Required for rental companies.</div>
+  </div>
+  <button class="btn btn-primary">Sign up</button>
+</form>
+{% endblock %}

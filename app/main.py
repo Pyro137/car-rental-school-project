@@ -2,11 +2,15 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
+from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
+from starlette.middleware.sessions import SessionMiddleware
 
 from app import models  # noqa: F401  (registers the tables on Base.metadata)
+from app.config import settings
 from app.db import init_db
-from app.deps import templates
+from app.deps import LoginRequired, templates
+from app.routers import auth
 
 
 @asynccontextmanager
@@ -16,7 +20,9 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="Car Rental", lifespan=lifespan)
+app.add_middleware(SessionMiddleware, secret_key=settings.secret_key, same_site="lax")
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
+app.include_router(auth.router)
 
 
 @app.exception_handler(RequestValidationError)
@@ -28,6 +34,11 @@ def invalid_input(request: Request, exc: RequestValidationError):
         {"title": "Invalid input", "messages": messages},
         status_code=422,
     )
+
+
+@app.exception_handler(LoginRequired)
+def redirect_to_login(request: Request, exc: LoginRequired):
+    return RedirectResponse("/login", status_code=303)
 
 
 @app.get("/health")
