@@ -9,7 +9,7 @@ The project uses a Python web application with server-rendered HTML and a Postgr
 | Software or tool | Version | Purpose |
 |---|---|---|
 | Python | 3.13 | Application programming language |
-| FastAPI | [VERSION TO CONFIRM] | HTTP routes, form handling, and dependency injection |
+| FastAPI | 0.143.0 | HTTP routes, form handling, and dependency injection |
 | Uvicorn | 0.54.0 | Application server |
 | SQLAlchemy | 2.1.4 | Synchronous database access and ORM models |
 | PostgreSQL | 16 | Relational storage and reservation range constraints |
