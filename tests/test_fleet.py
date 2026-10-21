@@ -109,6 +109,7 @@ def test_car_form_preserves_image_url(form_data: dict[str, str | int | float]) -
 
     assert CarForm(**form_data).image_url == "https://example.com/car.jpg"
 
+
 def test_fleet_page_shows_own_cars(client, make_user, make_car, login):
     owner = make_user("company")
     other_owner = make_user("company")
