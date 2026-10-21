@@ -108,3 +108,49 @@ def test_car_form_preserves_image_url(form_data: dict[str, str | int | float]) -
     form_data["image_url"] = "https://example.com/car.jpg"
 
     assert CarForm(**form_data).image_url == "https://example.com/car.jpg"
+
+
+def test_fleet_page_shows_own_cars(client, make_user, make_car, login):
+    owner = make_user("company")
+    other_owner = make_user("company")
+
+    make_car(owner, brand="Toyota", model="Corolla")
+    make_car(owner, brand="Renault", model="Clio", is_active=False)
+    make_car(other_owner, brand="Hyundai", model="Tucson")
+
+    login(owner)
+    response = client.get("/fleet")
+
+    assert response.status_code == 200
+    assert "My Fleet" in response.text
+    assert "Toyota" in response.text
+    assert "Renault" in response.text
+    assert "Inactive" in response.text
+    assert "Hyundai" not in response.text
+
+
+def test_fleet_page_empty(client, make_user, login):
+    owner = make_user("company")
+    login(owner)
+
+    response = client.get("/fleet")
+
+    assert response.status_code == 200
+    assert "You have no cars yet." in response.text
+    assert "Add car" in response.text
+
+
+def test_fleet_page_forbidden_for_customer(client, make_user, login):
+    customer = make_user("customer")
+    login(customer)
+
+    response = client.get("/fleet")
+
+    assert response.status_code == 403
+
+
+def test_fleet_page_requires_login(client):
+    response = client.get("/fleet", follow_redirects=False)
+
+    assert response.status_code == 303
+    assert response.headers["location"].startswith("/login")
