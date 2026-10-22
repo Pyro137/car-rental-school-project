@@ -1,0 +1,77 @@
+﻿{% extends "base.html" %}
+{% block title %}{{ "Edit car" if car else "Add car" }}{% endblock %}
+{% block content %}
+<h1 class="h3 mb-3">{{ "Edit car" if car else "Add car" }}</h1>
+<form method="post" class="row g-3 col-md-8">
+  <div class="col-md-6">
+    <label class="form-label" for="brand">Brand</label>
+    <input class="form-control" id="brand" name="brand" value="{{ car.brand if car }}" required>
+  </div>
+  <div class="col-md-6">
+    <label class="form-label" for="model">Model</label>
+    <input class="form-control" id="model" name="model" value="{{ car.model if car }}" required>
+  </div>
+  <div class="col-md-6">
+    <label class="form-label" for="city">City</label>
+    <input class="form-control" id="city" name="city" value="{{ car.city if car }}" required>
+  </div>
+  <div class="col-md-6">
+    <label class="form-label" for="year">Year</label>
+    <input class="form-control" type="number" id="year" name="year" min="1990" max="2030"
+           value="{{ car.year if car }}" required>
+  </div>
+  <div class="col-md-6">
+    <label class="form-label" for="category">Category</label>
+    <select class="form-select" id="category" name="category" required>
+      {% for value in ["economy", "sedan", "suv", "van", "luxury"] %}
+      <option value="{{ value }}" {{ "selected" if car and car.category == value }}>{{ value|capitalize }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-6">
+    <label class="form-label" for="transmission">Transmission</label>
+    <select class="form-select" id="transmission" name="transmission" required>
+      {% for value in ["manual", "automatic"] %}
+      <option value="{{ value }}" {{ "selected" if car and car.transmission == value }}>{{ value|capitalize }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-6">
+    <label class="form-label" for="fuel">Fuel</label>
+    <select class="form-select" id="fuel" name="fuel" required>
+      {% for value in ["gasoline", "diesel", "hybrid", "electric"] %}
+      <option value="{{ value }}" {{ "selected" if car and car.fuel == value }}>{{ value|capitalize }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-6">
+    <label class="form-label" for="seats">Seats</label>
+    <input class="form-control" type="number" id="seats" name="seats" min="1" max="9"
+           value="{{ car.seats if car }}" required>
+  </div>
+  <div class="col-md-6">
+    <label class="form-label" for="daily_price">Daily price (TL)</label>
+    <input class="form-control" type="number" id="daily_price" name="daily_price" min="1" step="0.01"
+           value="{{ car.daily_price if car }}" required>
+  </div>
+  <div class="col-md-6">
+    <label class="form-label" for="image_url">Image URL</label>
+    <input class="form-control" type="url" id="image_url" name="image_url"
+           value="{{ car.image_url or '' if car }}">
+  </div>
+  <div class="col-md-6">
+    <label class="form-label" for="lat">Latitude</label>
+    <input class="form-control" type="number" id="lat" name="lat" min="-90" max="90" step="any"
+           value="{{ car.lat if car }}" required>
+  </div>
+  <div class="col-md-6">
+    <label class="form-label" for="lng">Longitude</label>
+    <input class="form-control" type="number" id="lng" name="lng" min="-180" max="180" step="any"
+           value="{{ car.lng if car }}" required>
+  </div>
+  <div class="col-12">
+    <button class="btn btn-primary" type="submit">Save</button>
+    <a class="btn btn-secondary" href="/fleet">Cancel</a>
+  </div>
+</form>
+{% endblock %}
