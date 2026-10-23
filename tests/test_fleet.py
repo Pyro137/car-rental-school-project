@@ -2,7 +2,9 @@ from collections.abc import Callable
 from decimal import Decimal
 
 import pytest
+from fastapi.testclient import TestClient
 from pydantic import ValidationError
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.models import Car, User
@@ -154,3 +156,92 @@ def test_fleet_page_requires_login(client):
 
     assert response.status_code == 303
     assert response.headers["location"].startswith("/login")
+
+
+def test_new_car_form(
+    client: TestClient, make_user: Callable[..., User], login: Callable[[User], None]
+) -> None:
+    login(make_user("company"))
+
+    response = client.get("/fleet/new")
+
+    assert response.status_code == 200
+    assert response.context["car"] is None
+    assert "Add car" in response.text
+    assert 'name="daily_price"' in response.text
+    assert "Save" in response.text
+    assert 'href="/fleet">Cancel' in response.text
+
+
+def test_create_car_from_form(
+    client: TestClient,
+    db: Session,
+    make_user: Callable[..., User],
+    login: Callable[[User], None],
+    form_data: dict[str, str | int | float],
+) -> None:
+    owner = make_user("company")
+    make_user("company")
+    owner_id = owner.id
+    customer = make_user("customer")
+    login(owner)
+
+    response = client.post("/fleet/new", data=form_data, follow_redirects=False)
+
+    assert response.status_code == 303
+    assert response.headers["location"] == "/fleet"
+    db.expire_all()
+    car = db.scalar(select(Car))
+    assert car is not None
+    assert car.owner_id == owner_id
+    for field, value in form_data.items():
+        expected = Decimal(value) if field == "daily_price" else value
+        if field == "image_url":
+            expected = None
+        assert getattr(car, field) == expected
+    assert car.is_active is True
+
+    fleet_page = client.get("/fleet")
+    assert fleet_page.status_code == 200
+    assert "Fiat Egea" in fleet_page.text
+    assert "Car added." in fleet_page.text
+    assert "Car added." not in client.get("/fleet").text
+
+    login(customer)
+    cars_page = client.get("/cars")
+    assert cars_page.status_code == 200
+    assert "Fiat Egea" in cars_page.text
+
+
+def test_create_car_rejects_invalid_seats(
+    client: TestClient,
+    db: Session,
+    make_user: Callable[..., User],
+    login: Callable[[User], None],
+    form_data: dict[str, str | int | float],
+) -> None:
+    login(make_user("company"))
+    form_data["seats"] = 0
+
+    response = client.post("/fleet/new", data=form_data, follow_redirects=False)
+
+    assert response.status_code == 422
+    assert "Invalid input" in response.text
+    db.expire_all()
+    assert db.scalar(select(Car)) is None
+
+
+def test_create_car_forbidden_for_customer(
+    client: TestClient,
+    db: Session,
+    make_user: Callable[..., User],
+    login: Callable[[User], None],
+    form_data: dict[str, str | int | float],
+) -> None:
+    login(make_user("customer"))
+
+    response = client.post("/fleet/new", data=form_data, follow_redirects=False)
+
+    assert response.status_code == 403
+    db.expire_all()
+    assert db.scalar(select(Car)) is None
