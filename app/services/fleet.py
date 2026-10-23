@@ -40,3 +40,19 @@ def create(db: Session, owner_id: int, form: CarForm) -> Car:
     db.add(car)
     db.commit()
     return car
+
+
+def get_owned(db: Session, owner_id: int, car_id: int) -> Car | None:
+    car = db.get(Car, car_id)
+    return car if car and car.owner_id == owner_id else None
+
+
+def update(db: Session, car: Car, form: CarForm) -> None:
+    for field, value in form.model_dump().items():
+        setattr(car, field, value)
+    db.commit()
+
+
+def toggle_active(db: Session, car: Car) -> None:
+    car.is_active = not car.is_active
+    db.commit()

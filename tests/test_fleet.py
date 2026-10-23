@@ -100,6 +100,90 @@ def test_car_form_rejects_invalid_values(
         CarForm(**form_data)
 
 
+@pytest.mark.parametrize("is_active", [True, False])
+def test_get_owned(
+    db: Session,
+    make_user: Callable[..., User],
+    make_car: Callable[..., Car],
+    is_active: bool,
+) -> None:
+    owner = make_user("company")
+    car = make_car(owner, is_active=is_active)
+
+    assert fleet.get_owned(db, owner.id, car.id) is car
+
+
+def test_get_owned_rejects_other_owner(
+    db: Session, make_user: Callable[..., User], make_car: Callable[..., Car]
+) -> None:
+    owner = make_user("company")
+    car = make_car(make_user("company"))
+
+    assert fleet.get_owned(db, owner.id, car.id) is None
+
+
+def test_get_owned_missing_car(db: Session, make_user: Callable[..., User]) -> None:
+    owner = make_user("company")
+
+    assert fleet.get_owned(db, owner.id, 99999) is None
+
+
+def test_update_persists_all_form_fields(
+    db: Session, make_user: Callable[..., User], make_car: Callable[..., Car]
+) -> None:
+    owner = make_user("company")
+    owner_id = owner.id
+    car = make_car(owner, is_active=False)
+    car_id = car.id
+    form = CarForm(
+        brand="Toyota",
+        model="RAV4",
+        city="Ankara",
+        year=2025,
+        category="suv",
+        transmission="automatic",
+        fuel="hybrid",
+        seats=7,
+        daily_price=Decimal("2500.75"),
+        lat=39.93,
+        lng=32.86,
+        image_url="https://example.com/rav4.jpg",
+    )
+
+    fleet.update(db, car, form)
+    db.rollback()
+    db.expunge_all()
+    saved = db.get(Car, car_id)
+
+    assert saved is not None
+    for field, value in form.model_dump().items():
+        assert getattr(saved, field) == value
+    assert isinstance(saved.daily_price, Decimal)
+    assert saved.owner_id == owner_id
+    assert saved.is_active is False
+
+
+def test_toggle_active_persists_both_states(
+    db: Session, make_user: Callable[..., User], make_car: Callable[..., Car]
+) -> None:
+    car = make_car(make_user("company"))
+    car_id = car.id
+
+    fleet.toggle_active(db, car)
+    db.rollback()
+    db.expunge_all()
+    saved = db.get(Car, car_id)
+    assert saved is not None
+    assert saved.is_active is False
+
+    fleet.toggle_active(db, saved)
+    db.rollback()
+    db.expunge_all()
+    saved = db.get(Car, car_id)
+    assert saved is not None
+    assert saved.is_active is True
+
+
 def test_car_form_optional_image(form_data: dict[str, str | int | float]) -> None:
     del form_data["image_url"]
 
