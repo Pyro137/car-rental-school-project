@@ -32,6 +32,23 @@ Open http://localhost:8000. Demo accounts (password `demo1234`):
 - Customer: `customer@example.com`
 - Companies: `acme@example.com`, `speedcar@example.com`, `luxeride@example.com`
 
+## Try it end to end
+
+Start from a fresh database (`uv run python -m scripts.seed`), then:
+
+1. **Company:** click "Sign up", choose "Rental company" and enter a company name.
+   "My fleet" appears in the menu.
+2. Open "My fleet", click "Add car", fill in the form and save. "Car added." is shown once.
+3. Click "Edit" on the new car, change the price and save. Then click "Deactivate" and
+   "Activate" again; the status badge follows.
+4. Click "Log out". **Customer:** sign up as "Customer".
+5. On "Cars", filter by the new car's brand and a price range around it, then click "Details".
+6. **Access rules:** as the customer, open http://localhost:8000/fleet and get 403. Log out
+   and log in with a wrong password; it is rejected.
+
+While the car is inactive in step 3, it is missing from "Cars" and its details page returns
+404. After running the seed again, log out and back in.
+
 ## Checks
 
 ```bash
