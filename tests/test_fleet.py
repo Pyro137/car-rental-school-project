@@ -208,7 +208,7 @@ def test_fleet_page_shows_own_cars(client, make_user, make_car, login):
     response = client.get("/fleet")
 
     assert response.status_code == 200
-    assert "My Fleet" in response.text
+    assert "My fleet" in response.text
     assert "Toyota" in response.text
     assert "Renault" in response.text
     assert "Inactive" in response.text
@@ -222,7 +222,7 @@ def test_fleet_page_empty(client, make_user, login):
     response = client.get("/fleet")
 
     assert response.status_code == 200
-    assert "You have no cars yet." in response.text
+    assert "You have not added any cars yet." in response.text
     assert "Add car" in response.text
 
 
@@ -329,3 +329,98 @@ def test_create_car_forbidden_for_customer(
     assert response.status_code == 403
     db.expire_all()
     assert db.scalar(select(Car)) is None
+
+
+def test_edit_form_shows_current_values(
+    client: TestClient,
+    make_user: Callable[..., User],
+    make_car: Callable[..., Car],
+    login: Callable[[User], None],
+) -> None:
+    owner = make_user("company")
+    car = make_car(owner, model="Doblo", fuel="gasoline")
+    login(owner)
+
+    response = client.get(f"/fleet/{car.id}/edit")
+
+    assert response.status_code == 200
+    assert response.context["car"].id == car.id
+    assert "Edit car" in response.text
+    assert 'value="Doblo"' in response.text
+    assert '<option value="gasoline" selected>' in response.text
+    assert f'href="/fleet/{car.id}/edit"' in client.get("/fleet").text
+
+
+def test_edit_car_updates_customer_list(
+    client: TestClient,
+    db: Session,
+    make_user: Callable[..., User],
+    make_car: Callable[..., Car],
+    login: Callable[[User], None],
+    form_data: dict[str, str | int | float],
+) -> None:
+    owner = make_user("company")
+    car = make_car(owner)
+    car_id = car.id
+    login(owner)
+    form_data["model"] = "Linea"
+    form_data["daily_price"] = "1500.00"
+
+    response = client.post(f"/fleet/{car_id}/edit", data=form_data, follow_redirects=False)
+
+    assert response.status_code == 303
+    assert response.headers["location"] == "/fleet"
+    db.expire_all()
+    saved = db.get(Car, car_id)
+    assert saved is not None
+    assert saved.model == "Linea"
+    assert saved.daily_price == Decimal("1500.00")
+    assert "Car updated." in client.get("/fleet").text
+
+    login(make_user("customer"))
+    cars_page = client.get("/cars")
+    assert "Fiat Linea" in cars_page.text
+    assert "Egea" not in cars_page.text
+
+
+def test_edit_other_company_car_returns_404(
+    client: TestClient,
+    db: Session,
+    make_user: Callable[..., User],
+    make_car: Callable[..., Car],
+    login: Callable[[User], None],
+    form_data: dict[str, str | int | float],
+) -> None:
+    car = make_car(make_user("company"))
+    car_id = car.id
+    login(make_user("company"))
+    form_data["model"] = "Linea"
+
+    assert client.get(f"/fleet/{car_id}/edit").status_code == 404
+    response = client.post(f"/fleet/{car_id}/edit", data=form_data, follow_redirects=False)
+
+    assert response.status_code == 404
+    db.expire_all()
+    saved = db.get(Car, car_id)
+    assert saved is not None
+    assert saved.model == "Egea"
+
+
+def test_edit_missing_car_returns_404(
+    client: TestClient, make_user: Callable[..., User], login: Callable[[User], None]
+) -> None:
+    login(make_user("company"))
+
+    assert client.get("/fleet/99999/edit").status_code == 404
+
+
+def test_edit_forbidden_for_customer(
+    client: TestClient,
+    make_user: Callable[..., User],
+    make_car: Callable[..., Car],
+    login: Callable[[User], None],
+) -> None:
+    car = make_car(make_user("company"))
+    login(make_user("customer"))
+
+    assert client.get(f"/fleet/{car.id}/edit").status_code == 403

@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Form, Request
+from fastapi import APIRouter, Form, HTTPException, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 
 from app.deps import Company, Db, templates
@@ -32,4 +32,24 @@ def create(
 ) -> RedirectResponse:
     fleet.create(db, user.id, form)
     request.session["flash"] = "Car added."
+    return RedirectResponse("/fleet", status_code=303)
+
+
+@router.get("/{car_id}/edit")
+def edit_form(request: Request, db: Db, user: Company, car_id: int) -> HTMLResponse:
+    car = fleet.get_owned(db, user.id, car_id)
+    if car is None:
+        raise HTTPException(status_code=404)
+    return templates.TemplateResponse(request, "fleet/form.html", {"car": car})
+
+
+@router.post("/{car_id}/edit")
+def edit(
+    request: Request, db: Db, user: Company, car_id: int, form: Annotated[CarForm, Form()]
+) -> RedirectResponse:
+    car = fleet.get_owned(db, user.id, car_id)
+    if car is None:
+        raise HTTPException(status_code=404)
+    fleet.update(db, car, form)
+    request.session["flash"] = "Car updated."
     return RedirectResponse("/fleet", status_code=303)

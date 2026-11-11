@@ -1,30 +1,29 @@
-
 {% extends "base.html" %}
-{% block title %}My Fleet{% endblock %}
-
+{% block title %}My fleet{% endblock %}
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-3">
-  <h1 class="h3 mb-0">My Fleet</h1>
+  <h1 class="h3 mb-0">My fleet</h1>
   <a href="/fleet/new" class="btn btn-primary">Add car</a>
 </div>
 
 {% if not cars %}
-<p class="text-secondary">You have no cars yet.</p>
+<p class="text-secondary">You have not added any cars yet.</p>
 {% else %}
 <div class="table-responsive">
   <table class="table table-striped align-middle">
     <thead>
       <tr>
-        <th>Brand / Model</th>
+        <th>Car</th>
         <th>City</th>
-        <th>Daily Price</th>
+        <th>Daily price</th>
         <th>Status</th>
+        <th></th>
       </tr>
     </thead>
     <tbody>
       {% for car in cars %}
       <tr>
-        <td>{{ car.brand }} {{ car.model }}</td>
+        <td>{{ car.brand }} {{ car.model }} ({{ car.year }})</td>
         <td>{{ car.city }}</td>
         <td>{{ car.daily_price }} ₺</td>
         <td>
@@ -33,6 +32,9 @@
           {% else %}
           <span class="badge text-bg-secondary">Inactive</span>
           {% endif %}
+        </td>
+        <td class="text-end">
+          <a class="btn btn-outline-primary btn-sm" href="/fleet/{{ car.id }}/edit">Edit</a>
         </td>
       </tr>
       {% endfor %}
