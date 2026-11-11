@@ -92,3 +92,34 @@ def test_list_brands(db, make_user, make_car):
     owner = add_three_cars(make_user, make_car)
     make_car(owner, model="Doblo")
     assert cars.list_brands(db) == ["Fiat", "Hyundai", "Renault"]
+
+
+def test_get_active_car(db, make_user, make_car):
+    car = make_car(make_user("company"))
+    assert cars.get_active_car(db, car.id) is car
+
+
+def test_get_active_car_missing_or_inactive(db, make_user, make_car):
+    inactive = make_car(make_user("company"), is_active=False)
+    assert cars.get_active_car(db, inactive.id) is None
+    assert cars.get_active_car(db, 99999) is None
+
+
+def test_detail_page(client, make_user, make_car):
+    car = make_car(make_user("company"), image_url="https://example.com/egea.jpg")
+
+    response = client.get(f"/cars/{car.id}")
+
+    assert response.status_code == 200
+    assert "Fiat Egea (2023)" in response.text
+    assert "Offered by Company 1 · Adana" in response.text
+    assert 'src="https://example.com/egea.jpg"' in response.text
+    assert "1200.00 ₺" in response.text
+    assert f'href="/cars/{car.id}"' in client.get("/cars").text
+
+
+def test_detail_page_not_found(client, make_user, make_car):
+    inactive = make_car(make_user("company"), is_active=False)
+
+    assert client.get("/cars/99999").status_code == 404
+    assert client.get(f"/cars/{inactive.id}").status_code == 404

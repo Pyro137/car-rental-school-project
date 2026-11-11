@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Query, Request
+from fastapi import APIRouter, HTTPException, Query, Request
 
 from app.deps import Db, templates
 from app.services import cars
@@ -20,3 +20,11 @@ def car_list(request: Request, db: Db, filters: Annotated[CarFilters, Query()]):
             "filters": filters,
         },
     )
+
+
+@router.get("/cars/{car_id}")
+def car_detail(request: Request, db: Db, car_id: int):
+    car = cars.get_active_car(db, car_id)
+    if car is None:
+        raise HTTPException(status_code=404)
+    return templates.TemplateResponse(request, "cars/detail.html", {"car": car})

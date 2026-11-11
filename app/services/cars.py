@@ -43,5 +43,10 @@ def list_cars(db: Session, filters: CarFilters) -> Sequence[Car]:
     return db.scalars(stmt).all()
 
 
+def get_active_car(db: Session, car_id: int) -> Car | None:
+    car = db.get(Car, car_id)
+    return car if car and car.is_active else None
+
+
 def list_brands(db: Session) -> Sequence[str]:
     return db.scalars(select(Car.brand).where(Car.is_active).distinct().order_by(Car.brand)).all()
