@@ -53,3 +53,12 @@ def edit(
     fleet.update(db, car, form)
     request.session["flash"] = "Car updated."
     return RedirectResponse("/fleet", status_code=303)
+
+
+@router.post("/{car_id}/toggle")
+def toggle(db: Db, user: Company, car_id: int) -> RedirectResponse:
+    car = fleet.get_owned(db, user.id, car_id)
+    if car is None:
+        raise HTTPException(status_code=404)
+    fleet.toggle_active(db, car)
+    return RedirectResponse("/fleet", status_code=303)

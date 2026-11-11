@@ -424,3 +424,73 @@ def test_edit_forbidden_for_customer(
     login(make_user("customer"))
 
     assert client.get(f"/fleet/{car.id}/edit").status_code == 403
+
+
+def test_toggle_hides_car_from_customers_and_back(
+    client: TestClient,
+    db: Session,
+    make_user: Callable[..., User],
+    make_car: Callable[..., Car],
+    login: Callable[[User], None],
+) -> None:
+    owner = make_user("company")
+    customer = make_user("customer")
+    car = make_car(owner)
+    car_id = car.id
+    login(owner)
+    toggle_form = f'action="/fleet/{car_id}/toggle"'
+    assert toggle_form in client.get("/fleet").text
+    assert "Deactivate" in client.get("/fleet").text
+
+    response = client.post(f"/fleet/{car_id}/toggle", follow_redirects=False)
+
+    assert response.status_code == 303
+    assert response.headers["location"] == "/fleet"
+    db.expire_all()
+    assert db.get(Car, car_id).is_active is False
+    fleet_page = client.get("/fleet").text
+    assert "Inactive" in fleet_page
+    assert "Activate" in fleet_page
+    assert "Deactivate" not in fleet_page
+    login(customer)
+    assert "Fiat Egea" not in client.get("/cars").text
+
+    login(owner)
+    client.post(f"/fleet/{car_id}/toggle", follow_redirects=False)
+
+    db.expire_all()
+    assert db.get(Car, car_id).is_active is True
+    login(customer)
+    assert "Fiat Egea" in client.get("/cars").text
+
+
+def test_toggle_other_company_car_returns_404(
+    client: TestClient,
+    db: Session,
+    make_user: Callable[..., User],
+    make_car: Callable[..., Car],
+    login: Callable[[User], None],
+) -> None:
+    car = make_car(make_user("company"))
+    car_id = car.id
+    login(make_user("company"))
+
+    response = client.post(f"/fleet/{car_id}/toggle", follow_redirects=False)
+
+    assert response.status_code == 404
+    db.expire_all()
+    assert db.get(Car, car_id).is_active is True
+
+
+def test_toggle_forbidden_for_customer(
+    client: TestClient,
+    make_user: Callable[..., User],
+    make_car: Callable[..., Car],
+    login: Callable[[User], None],
+) -> None:
+    car = make_car(make_user("company"))
+    login(make_user("customer"))
+
+    response = client.post(f"/fleet/{car.id}/toggle", follow_redirects=False)
+
+    assert response.status_code == 403
