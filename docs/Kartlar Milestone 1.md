@@ -10,27 +10,27 @@ Milestone 1'in görevleri, her biri tek bir PR olan ve yapay zekâya olduğu gib
 
 | Kart | Başlık | Sahip | Bağımlı | Durum |
 | --- | --- | --- | --- | --- |
-| 1.1a | Proje iskeleti | Metin |  | Başlamadı |
+| 1.1a | Proje iskeleti | Metin |  | Bitti |
 | 1.1b | GitHub, AGENTS.md ve CI | Metin | 1.1a | Bitti |
 | 1.2a | Ayarlar, veritabanı ve modeller | Metin | 1.1a | Bitti |
-| 1.2b | Test altyapısı | Metin | 1.3a | Başlamadı |
-| 1.3a | Kimlik servisi ve yetki bağımlılıkları | Metin | 1.2a | Başlamadı |
-| 1.4a | Ortak şablon ve hata sayfası | Metin | 1.2a | Başlamadı |
-| 1.3b | Giriş ve kayıt sayfaları | Metin | 1.3a, 1.4a, 1.2b | Başlamadı |
-| 1.5a | Araç listesi servisi | Metin | 1.2b | Başlamadı |
-| 1.5b | Araç listesi sayfası ve boş rota dosyaları | Metin | 1.5a, 1.4a | Başlamadı |
-| 1.7a | Seed iskeleti | Metin | 1.3a | Başlamadı |
-| 1.7b | Demo verisi: 30 araç | C | 1.7a | Başlamadı |
-| 1.8a | Filo servisi: form modeli, listeleme, ekleme | B | 1.5b | Başlamadı |
-| 1.8b | Filom sayfası | B | 1.8a | Başlamadı |
-| 1.8c | Araç ekleme formu | B | 1.8b | Başlamadı |
-| 1.9a | Sahiplik, düzenleme ve pasife alma servisi | B | 1.8a | Başlamadı |
-| 1.9b | Düzenleme sayfası | B | 1.9a, 1.8c | Başlamadı |
-| 1.9c | Pasife alma düğmesi | B | 1.9a, 1.8b | Başlamadı |
-| 1.10a | Araç detay sayfası | B | 1.5b | Başlamadı |
-| 1.11a | Kaynak toplama | C |  | Başlamadı |
-| 1.11b | Kaynakça (APA 7) | C | 1.11a | Başlamadı |
-| 1.12a | "Project Materials" taslağı | B | 1.1b | Başlamadı |
+| 1.2b | Test altyapısı | Metin | 1.3a | Bitti |
+| 1.3a | Kimlik servisi ve yetki bağımlılıkları | Metin | 1.2a | Bitti |
+| 1.4a | Ortak şablon ve hata sayfası | Metin | 1.2a | Bitti |
+| 1.3b | Giriş ve kayıt sayfaları | Metin | 1.3a, 1.4a, 1.2b | Bitti |
+| 1.5a | Araç listesi servisi | Metin | 1.2b | Bitti |
+| 1.5b | Araç listesi sayfası ve boş rota dosyaları | Metin | 1.5a, 1.4a | Bitti |
+| 1.7a | Seed iskeleti | Metin | 1.3a | Bitti |
+| 1.7b | Demo verisi: 30 araç | C | 1.7a | Bitti |
+| 1.8a | Filo servisi: form modeli, listeleme, ekleme | B | 1.5b | Bitti |
+| 1.8b | Filom sayfası | B | 1.8a | Bitti |
+| 1.8c | Araç ekleme formu | B | 1.8b | Bitti |
+| 1.9a | Sahiplik, düzenleme ve pasife alma servisi | B | 1.8a | Bitti |
+| 1.9b | Düzenleme sayfası | B | 1.9a, 1.8c | İncelemede |
+| 1.9c | Pasife alma düğmesi | B | 1.9a, 1.8b | İncelemede |
+| 1.10a | Araç detay sayfası | B | 1.5b | İncelemede |
+| 1.11a | Kaynak toplama | C |  | Bitti |
+| 1.11b | Kaynakça (APA 7) | C | 1.11a | İncelemede |
+| 1.12a | "Project Materials" taslağı | B | 1.1b | Bitti |
 | 1.12b | Use case diyagramı | C |  | Başlamadı |
 
 Ortak oturumlar (ana plandaki 1.6) kart değildir; yeri ve gündemi "Milestone 1: adım adım" sekmesindedir. Oturum 1, 1.1b'den sonra; Oturum 2 ve 3, 1.5b'den sonra yapılır.

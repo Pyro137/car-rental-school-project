@@ -2,9 +2,9 @@
 
 ## 3.1 Software and Tools
 
-The project uses a Python web application with server-rendered HTML and a PostgreSQL database. Table 1 lists the software and tools selected for development. Python package versions reflect the supplied dependency output; platform and frontend versions follow the project specification.
+The project uses a Python web application with server-rendered HTML and a PostgreSQL database. Table 3.1 lists the software and tools selected for development. Python package versions reflect the supplied dependency output; platform and frontend versions follow the project specification.
 
-**Table 1. Software, versions, and purposes**
+**Table 3.1. Software, versions, and purposes**
 
 | Software or tool | Version | Purpose |
 |---|---|---|
