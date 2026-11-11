@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}{{ car.brand }} {{ car.model }}{% endblock %}
+{% block content %}
+<a class="btn btn-link px-0 mb-2" href="/cars">&larr; Back to cars</a>
+<h1 class="h3 mb-1">{{ car.brand }} {{ car.model }} ({{ car.year }})</h1>
+<p class="text-secondary mb-4">Offered by {{ car.owner.company_name }} · {{ car.city }}</p>
+<div class="row g-4">
+  {% if car.image_url %}
+  <div class="col-md-6">
+    <img class="img-fluid rounded" src="{{ car.image_url }}" alt="{{ car.brand }} {{ car.model }}">
+  </div>
+  {% endif %}
+  <div class="col-md-6">
+    <table class="table">
+      <tbody>
+        <tr><th>Category</th><td>{{ car.category|capitalize }}</td></tr>
+        <tr><th>Seats</th><td>{{ car.seats }}</td></tr>
+        <tr><th>Transmission</th><td>{{ car.transmission|capitalize }}</td></tr>
+        <tr><th>Fuel</th><td>{{ car.fuel|capitalize }}</td></tr>
+        <tr><th>Daily price</th><td class="fw-semibold">{{ car.daily_price }} ₺</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
