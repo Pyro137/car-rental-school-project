@@ -35,6 +35,11 @@
         </td>
         <td class="text-end">
           <a class="btn btn-outline-primary btn-sm" href="/fleet/{{ car.id }}/edit">Edit</a>
+          <form method="post" action="/fleet/{{ car.id }}/toggle" class="d-inline">
+            <button class="btn btn-outline-secondary btn-sm">
+              {{ "Deactivate" if car.is_active else "Activate" }}
+            </button>
+          </form>
         </td>
       </tr>
       {% endfor %}
