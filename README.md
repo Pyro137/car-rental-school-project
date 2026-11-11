@@ -62,6 +62,6 @@ same checks on every pull request. Coding rules for people and AI tools are in `
 
 ## Team
 
-- Metin 2022556033
-- Gizem
+- Metin Işıkcan 2022556033
+- Gizem Acer 2023555001
 - Enes
